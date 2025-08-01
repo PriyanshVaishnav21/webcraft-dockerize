@@ -12,7 +12,7 @@ COPY bun.lockb ./
 
 # Install dependencies
 # Using npm since bun might not be available in the container
-RUN npm ci --only=production
+RUN npm ci
 
 # Copy source code
 COPY . .
