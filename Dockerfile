@@ -1,18 +1,14 @@
-# Multi-stage build for React + Vite application
-
-# Stage 1: Build the application
-FROM node:18-alpine AS builder
+# Simple Dockerfile for React + Vite application
+FROM node:18-alpine
 
 # Set working directory
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-COPY bun.lockb ./
 
 # Install dependencies
-# Using npm since bun might not be available in the container
-RUN npm ci
+RUN npm install
 
 # Copy source code
 COPY . .
@@ -20,17 +16,11 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Stage 2: Serve the application
-FROM nginx:alpine AS production
+# Install serve to serve static files
+RUN npm install -g serve
 
-# Copy built assets from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Expose port
+EXPOSE 3000
 
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port 80
-EXPOSE 80
-
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start the application
+CMD ["serve", "-s", "dist", "-l", "3000"]
